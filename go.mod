@@ -1,4 +1,4 @@
-module github.com/pflege-de/cc-connection
+module github.com/pflege-de/connect
 
 go 1.17
 

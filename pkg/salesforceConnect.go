@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/nimajalali/go-force/force"
-	"github.com/pflege-de/cc-connection/authentication"
+	"github.com/pflege-de/connect/authentication"
 )
 
 func GetForceApi() *force.ForceApi {
