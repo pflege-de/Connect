@@ -1,4 +1,4 @@
-package pkg
+package connect
 
 import (
 	"log"
