@@ -9,12 +9,12 @@ import (
 
 func NewForce() (*force.ForceApi, error) {
 	sfRequest := AuthenticationRequest{
-		URL:      os.Getenv("EVENT_SCAUD"),
-		Username: os.Getenv("EVENT_SCUSER"),
-		ClientID: os.Getenv("EVENT_CLIENT_ID"),
+		URL:      os.Getenv("SF_SCAUD"),
+		Username: os.Getenv("SF_SCUSER"),
+		ClientID: os.Getenv("SF_CLIENT_ID"),
 	}
 
-	privateKeyFile, err := os.Open(os.Getenv("EVENT_SCKEY"))
+	privateKeyFile, err := os.Open(os.Getenv("SF_SCKEY"))
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +26,8 @@ func NewForce() (*force.ForceApi, error) {
 
 	return force.CreateWithAccessToken(
 		"v53.0",
-		os.Getenv("EVENT_CLIENT_ID"),
+		os.Getenv("SF_CLIENT_ID"),
 		authReponse.GetToken(),
-		os.Getenv("EVENT_SCINSTANCE"),
+		os.Getenv("SF_SCINSTANCE"),
 		http.DefaultClient)
 }
