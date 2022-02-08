@@ -28,6 +28,5 @@ func NewForce() (*force.ForceApi, error) {
 		"v53.0",
 		os.Getenv("SF_CLIENT_ID"),
 		authReponse.GetToken(),
-		os.Getenv("SF_SCINSTANCE"),
-		http.DefaultClient)
+		os.Getenv("SF_SCINSTANCE"))
 }

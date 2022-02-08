@@ -144,6 +144,5 @@ func NewOAuthForce() (*force.ForceApi, error) {
 		"v53.0",
 		os.Getenv("EVENT_CLIENT_ID"),
 		authHandler.token.AccessToken,
-		os.Getenv("EVENT_SCINSTANCE"),
-		http.DefaultClient)
+		os.Getenv("EVENT_SCINSTANCE"))
 }
