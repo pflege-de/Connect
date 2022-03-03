@@ -11,7 +11,7 @@ import (
 // Date is a Salesforce Date
 type Date time.Time
 
-const DateFormatSF = "2005-10-08T01:02:03Z"
+const DateFormatSF = "2006-01-02T15:04:05-0700"
 
 // Implement Unmarshaler interface
 func (t *Date) UnmarshalJSON(b []byte) error {

@@ -1,8 +1,10 @@
 package authentication
 
 import (
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/nimajalali/go-force/force"
 )
@@ -20,6 +22,28 @@ func NewForce() (*force.ForceApi, error) {
 	}
 
 	authReponse, err := Authenticate(sfRequest, privateKeyFile, http.DefaultClient)
+	if err != nil {
+		return nil, err
+	}
+
+	return force.CreateWithAccessToken(
+		"v53.0",
+		os.Getenv("SF_CLIENT_ID"),
+		authReponse.GetToken(),
+		os.Getenv("SF_SCINSTANCE"))
+}
+
+func NewForceKeyStringSecret() (*force.ForceApi, error) {
+	sfRequest := AuthenticationRequest{
+		URL:      os.Getenv("SF_SCAUD"),
+		Username: os.Getenv("SF_SCUSER"),
+		ClientID: os.Getenv("SF_CLIENT_ID"),
+	}
+
+	r := ioutil.NopCloser(strings.NewReader(os.Getenv("SF_SCKEY"))) // r type is io.ReadCloser
+	defer r.Close()
+
+	authReponse, err := Authenticate(sfRequest, r, http.DefaultClient)
 	if err != nil {
 		return nil, err
 	}
