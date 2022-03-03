@@ -42,7 +42,10 @@ func NewForceKeyStringSecret() (*force.ForceApi, error) {
 		ClientID: os.Getenv("SF_CLIENT_ID"),
 	}
 
-	key, _ := x509.ParsePKCS1PrivateKey([]byte(os.Getenv("SF_SCKEY")))
+	key, err := x509.ParsePKCS1PrivateKey([]byte(os.Getenv("SF_SCKEY")))
+	if err != nil {
+		return nil, err
+	}
 
 	pemdata := pem.EncodeToMemory(
 		&pem.Block{
