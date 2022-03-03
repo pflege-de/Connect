@@ -15,6 +15,14 @@ func GetForceApi() *force.ForceApi {
 	return forceApi
 }
 
+func GetForceApiKeyStringSecret() *force.ForceApi {
+	forceApi, err := authentication.NewForceKeyStringSecret()
+	if err != nil {
+		log.Printf("Couldn't establish forceApi: %s", err)
+	}
+	return forceApi
+}
+
 func GetForceApiOAuth() *force.ForceApi {
 	forceApi, err := authentication.NewOAuthForce()
 	if err != nil {
