@@ -1,6 +1,8 @@
 package authentication
 
 import (
+	"crypto/x509"
+	"encoding/pem"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -40,7 +42,15 @@ func NewForceKeyStringSecret() (*force.ForceApi, error) {
 		ClientID: os.Getenv("SF_CLIENT_ID"),
 	}
 
-	r := ioutil.NopCloser(strings.NewReader(os.Getenv("SF_SCKEY"))) // r type is io.ReadCloser
+	key, _ := x509.ParsePKCS1PrivateKey([]byte(os.Getenv("SF_SCKEY")))
+
+	pemdata := pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "RSA PRIVATE KEY",
+			Bytes: x509.MarshalPKCS1PrivateKey(key),
+		},
+	)
+	r := ioutil.NopCloser(strings.NewReader(string(pemdata))) // r type is io.ReadCloser
 	defer r.Close()
 
 	authReponse, err := Authenticate(sfRequest, r, http.DefaultClient)
