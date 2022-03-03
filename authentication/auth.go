@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"crypto/x509"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -8,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/nimajalali/go-force/force"
-	"golang.org/x/crypto/ssh"
 )
 
 func NewForce() (*force.ForceApi, error) {
@@ -44,7 +44,7 @@ func NewForceKeyStringSecret() (*force.ForceApi, error) {
 
 	//ssh.ParseRawPrivateKey
 	//x509.ParsePKCS1PrivateKey([]byte(os.Getenv("SF_SCKEY")))
-	key, err := ssh.ParseRawPrivateKey([]byte(os.Getenv("SF_SCKEY")))
+	key, err := x509.ParsePKCS8PrivateKey([]byte(os.Getenv("SF_SCKEY")))
 	if err != nil {
 		return nil, err
 	}
