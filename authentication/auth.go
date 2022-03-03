@@ -1,14 +1,14 @@
 package authentication
 
 import (
-	"crypto/x509"
-	"encoding/pem"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/nimajalali/go-force/force"
+	"golang.org/x/crypto/ssh"
 )
 
 func NewForce() (*force.ForceApi, error) {
@@ -42,18 +42,15 @@ func NewForceKeyStringSecret() (*force.ForceApi, error) {
 		ClientID: os.Getenv("SF_CLIENT_ID"),
 	}
 
-	key, err := x509.ParsePKCS1PrivateKey([]byte(os.Getenv("SF_SCKEY")))
+	//ssh.ParseRawPrivateKey
+	//x509.ParsePKCS1PrivateKey([]byte(os.Getenv("SF_SCKEY")))
+	key, err := ssh.ParseRawPrivateKey([]byte(os.Getenv("SF_SCKEY")))
 	if err != nil {
 		return nil, err
 	}
+	log.Println(key)
 
-	pemdata := pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "RSA PRIVATE KEY",
-			Bytes: x509.MarshalPKCS1PrivateKey(key),
-		},
-	)
-	r := ioutil.NopCloser(strings.NewReader(string(pemdata))) // r type is io.ReadCloser
+	r := ioutil.NopCloser(strings.NewReader(string("test"))) // r type is io.ReadCloser
 	defer r.Close()
 
 	authReponse, err := Authenticate(sfRequest, r, http.DefaultClient)
