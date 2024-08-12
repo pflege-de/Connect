@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -18,7 +17,7 @@ import (
 
 const (
 	grantType     string = "urn:ietf:params:oauth:grant-type:jwt-bearer"
-	tokenEndpoint string = "/services/oauth2/token"
+	tokenEndpoint string = "/services/oauth2/token" //nolint:gosec (Wrongly recognized - G101: Potential hardcoded credentials)
 )
 
 type AuthenticationRequest struct {
@@ -75,7 +74,7 @@ func (response authenticationResponse) GetSignature() string { return response.S
 // Authenicate will exchange the JWT signed request for access token.
 func Authenticate(request AuthenticationRequest, privateKey io.ReadCloser, client *http.Client) (AuthenticationResponse, error) {
 
-	pemData, err := ioutil.ReadAll(privateKey)
+	pemData, err := io.ReadAll(privateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +121,7 @@ func Authenticate(request AuthenticationRequest, privateKey io.ReadCloser, clien
 		return nil, errors.Wrap(respErr, "response is bad")
 	}
 
-	body, bodyErr := ioutil.ReadAll(response.Body)
+	body, bodyErr := io.ReadAll(response.Body)
 	if bodyErr != nil {
 		return nil, bodyErr
 	}

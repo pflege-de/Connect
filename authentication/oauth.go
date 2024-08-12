@@ -3,13 +3,15 @@ package authentication
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
-	"github.com/nimajalali/go-force/force"
+	"github.com/pflege-de/go-force/force"
 )
 
 const (
@@ -80,26 +82,27 @@ func promptUser() {
 // getToken exchanges the authorizationCode for an access and refresh token
 func getToken(client *http.Client, authorizationCode string) (postAuthorizationCodeReponse, error) {
 	tokenResponse := postAuthorizationCodeReponse{}
-	url := url.URL{
+	urlQuery := url.URL{
 		Scheme: "https",
 		Host:   os.Getenv("SF_OAUTH_HOST"),
 		Path:   getTokenPath,
 	}
 
-	q := url.Query()
+	q := urlQuery.Query()
 	q.Set("grant_type", "authorization_code")
 	q.Set("code", authorizationCode)
 	q.Set("client_id", os.Getenv("SF_OAUTH_CLIENT_ID"))
 	q.Set("client_secret", os.Getenv("SF_OAUTH_CLIENT_SECRET"))
 	q.Set("redirect_uri", os.Getenv("SF_OAUTH_REDIRECT_URL"))
-	url.RawQuery = q.Encode()
+	urlQuery.RawQuery = q.Encode()
 
-	res, err := client.Post(url.String(), "application/x-www-form-urlencoded", nil)
+	res, err := client.Post(urlQuery.String(), "application/x-www-form-urlencoded", nil)
 	if err != nil {
 		return tokenResponse, fmt.Errorf("error sending the request: %w", err)
 	}
+	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return tokenResponse, fmt.Errorf("error reading the body: %w", err)
 	}
@@ -121,7 +124,7 @@ func NewOAuthForce() (*force.ForceApi, error) {
 
 	stopChannel := make(chan bool)
 	authHandler := OAuthHandler{shouldCloseServerChannel: stopChannel}
-	srv := http.Server{Addr: ":443", Handler: &authHandler}
+	srv := http.Server{Addr: ":443", Handler: &authHandler, ReadHeaderTimeout: 10 * time.Second}
 	ctx := context.Background()
 
 	go func(ctx context.Context, srv *http.Server, c chan bool) {
@@ -135,14 +138,15 @@ func NewOAuthForce() (*force.ForceApi, error) {
 	err := srv.ListenAndServeTLS("./tls.crt", "./tls.key")
 	// erstell das zertifikat aus cert-manager
 	//
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		fmt.Printf("error starting server: %v\n", err)
-		// TODO: log.Fatal?
 	}
 
 	return force.CreateWithAccessToken(
 		"v53.0",
 		os.Getenv("EVENT_CLIENT_ID"),
 		authHandler.token.AccessToken,
-		os.Getenv("EVENT_SCINSTANCE"))
+		os.Getenv("EVENT_SCINSTANCE"),
+		http.DefaultClient,
+	)
 }

@@ -2,13 +2,13 @@ package authentication
 
 import (
 	"crypto/x509"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 
-	"github.com/nimajalali/go-force/force"
+	"github.com/pflege-de/go-force/force"
 )
 
 func NewForce() (*force.ForceApi, error) {
@@ -32,7 +32,9 @@ func NewForce() (*force.ForceApi, error) {
 		"v53.0",
 		os.Getenv("SF_CLIENT_ID"),
 		authReponse.GetToken(),
-		os.Getenv("SF_SCINSTANCE"))
+		os.Getenv("SF_SCINSTANCE"),
+		http.DefaultClient,
+	)
 }
 
 func NewForceKeyStringSecret() (*force.ForceApi, error) {
@@ -50,7 +52,7 @@ func NewForceKeyStringSecret() (*force.ForceApi, error) {
 	}
 	log.Println(key)
 
-	r := ioutil.NopCloser(strings.NewReader(string("test"))) // r type is io.ReadCloser
+	r := io.NopCloser(strings.NewReader("test")) // r type is io.ReadCloser
 	defer r.Close()
 
 	authReponse, err := Authenticate(sfRequest, r, http.DefaultClient)
@@ -62,5 +64,7 @@ func NewForceKeyStringSecret() (*force.ForceApi, error) {
 		"v53.0",
 		os.Getenv("SF_CLIENT_ID"),
 		authReponse.GetToken(),
-		os.Getenv("SF_SCINSTANCE"))
+		os.Getenv("SF_SCINSTANCE"),
+		http.DefaultClient,
+	)
 }

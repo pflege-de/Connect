@@ -3,8 +3,8 @@ package connect
 import (
 	"log"
 
-	"github.com/nimajalali/go-force/force"
 	"github.com/pflege-de/connect/authentication"
+	"github.com/pflege-de/go-force/force"
 )
 
 func GetForceApi() *force.ForceApi {
