@@ -66,38 +66,38 @@ func (s *OAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // redirectURL must be set when creating a new salesforce connected app. For development edit /etc/hosts with an entry redirecting to 127.0.0.1 for redirectURL
 // later on, we can use localhorst.dev.p4e.io which redirects to 127.0.0.1 in AWS Route53.
 func promptUser() {
-	url := url.URL{
+	u := url.URL{
 		Scheme: "https",
 		Host:   os.Getenv("SF_OAUTH_HOST"),
 		Path:   authorizePath,
 	}
-	q := url.Query()
+	q := u.Query()
 	q.Set("response_type", "code")
 	q.Set("client_id", os.Getenv("SF_OAUTH_CLIENT_ID"))
 	q.Set("redirect_uri", os.Getenv("SF_OAUTH_REDIRECT_URL"))
-	url.RawQuery = q.Encode()
+	u.RawQuery = q.Encode()
 
-	fmt.Printf("\033[32mOpen this link in your browser to authenticate with salesforce OAuth\n\n\033[0m%s\n\n", url.String())
+	fmt.Printf("\033[32mOpen this link in your browser to authenticate with salesforce OAuth\n\n\033[0m%s\n\n", u.String())
 }
 
 // getToken exchanges the authorizationCode for an access and refresh token
 func getToken(client *http.Client, authorizationCode string) (postAuthorizationCodeReponse, error) {
 	tokenResponse := postAuthorizationCodeReponse{}
-	urlQuery := url.URL{
+	u := url.URL{
 		Scheme: "https",
 		Host:   os.Getenv("SF_OAUTH_HOST"),
 		Path:   getTokenPath,
 	}
 
-	q := urlQuery.Query()
+	q := u.Query()
 	q.Set("grant_type", "authorization_code")
 	q.Set("code", authorizationCode)
 	q.Set("client_id", os.Getenv("SF_OAUTH_CLIENT_ID"))
 	q.Set("client_secret", os.Getenv("SF_OAUTH_CLIENT_SECRET"))
 	q.Set("redirect_uri", os.Getenv("SF_OAUTH_REDIRECT_URL"))
-	urlQuery.RawQuery = q.Encode()
+	u.RawQuery = q.Encode()
 
-	res, err := client.Post(urlQuery.String(), "application/x-www-form-urlencoded", nil)
+	res, err := client.Post(u.String(), "application/x-www-form-urlencoded", nil)
 	if err != nil {
 		return tokenResponse, fmt.Errorf("error sending the request: %w", err)
 	}
