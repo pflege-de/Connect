@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	getTokenPath  string = "services/oauth2/token"
+	getTokenPath string = "services/oauth2/token" //nolint:gosec
+	// (Wrongly recognized - G101: Potential hardcoded credentials)
 	authorizePath string = "services/oauth2/authorize"
 )
 
@@ -124,7 +125,7 @@ func NewOAuthForce() (*force.ForceApi, error) {
 
 	stopChannel := make(chan bool)
 	authHandler := OAuthHandler{shouldCloseServerChannel: stopChannel}
-	srv := http.Server{Addr: ":443", Handler: &authHandler, ReadHeaderTimeout: 10 * time.Second}
+	srv := http.Server{Addr: ":443", Handler: &authHandler, ReadHeaderTimeout: 30 * time.Second}
 	ctx := context.Background()
 
 	go func(ctx context.Context, srv *http.Server, c chan bool) {
