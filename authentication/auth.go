@@ -11,7 +11,7 @@ import (
 	"github.com/pflege-de/go-force/force"
 )
 
-func NewForce() (*force.ForceApi, error) {
+func NewForce() (*force.ForceApiSObjectInterface, error) {
 	sfRequest := AuthenticationRequest{
 		URL:      os.Getenv("SF_SCAUD"),
 		Username: os.Getenv("SF_SCUSER"),
@@ -28,16 +28,17 @@ func NewForce() (*force.ForceApi, error) {
 		return nil, err
 	}
 
-	return force.CreateWithAccessToken(
+	fapi, err := force.CreateWithAccessToken(
 		"v53.0",
 		os.Getenv("SF_CLIENT_ID"),
 		authReponse.GetToken(),
 		os.Getenv("SF_SCINSTANCE"),
 		http.DefaultClient,
 	)
+	return &fapi, err
 }
 
-func NewForceKeyStringSecret() (*force.ForceApi, error) {
+func NewForceKeyStringSecret() (*force.ForceApiSObjectInterface, error) {
 	sfRequest := AuthenticationRequest{
 		URL:      os.Getenv("SF_SCAUD"),
 		Username: os.Getenv("SF_SCUSER"),
@@ -60,11 +61,12 @@ func NewForceKeyStringSecret() (*force.ForceApi, error) {
 		return nil, err
 	}
 
-	return force.CreateWithAccessToken(
+	fapi, err := force.CreateWithAccessToken(
 		"v53.0",
 		os.Getenv("SF_CLIENT_ID"),
 		authReponse.GetToken(),
 		os.Getenv("SF_SCINSTANCE"),
 		http.DefaultClient,
 	)
+	return &fapi, err
 }

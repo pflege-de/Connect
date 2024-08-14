@@ -115,7 +115,7 @@ func getToken(client *http.Client, authorizationCode string) (postAuthorizationC
 	return tokenResponse, nil
 }
 
-func NewOAuthForce() (*force.ForceApi, error) {
+func NewOAuthForce() (*force.ForceApiSObjectInterface, error) {
 	// prompt the user by printing the url to a salesforce login page
 	// launch goroutine accepting the redirect
 	// block until token is returned
@@ -143,11 +143,14 @@ func NewOAuthForce() (*force.ForceApi, error) {
 		fmt.Printf("error starting server: %v\n", err)
 	}
 
-	return force.CreateWithAccessToken(
-		"v53.0",
-		os.Getenv("EVENT_CLIENT_ID"),
-		authHandler.token.AccessToken,
-		os.Getenv("EVENT_SCINSTANCE"),
-		http.DefaultClient,
-	)
+	fapi, err :=
+		force.CreateWithAccessToken(
+			"v53.0",
+			os.Getenv("EVENT_CLIENT_ID"),
+			authHandler.token.AccessToken,
+			os.Getenv("EVENT_SCINSTANCE"),
+			http.DefaultClient,
+		)
+
+	return &fapi, err
 }
