@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -18,7 +17,8 @@ import (
 
 const (
 	grantType     string = "urn:ietf:params:oauth:grant-type:jwt-bearer"
-	tokenEndpoint string = "/services/oauth2/token"
+	tokenEndpoint string = "/services/oauth2/token" //nolint:gosec
+	// (Wrongly recognized - G101: Potential hardcoded credentials)
 )
 
 type AuthenticationRequest struct {
@@ -54,28 +54,28 @@ type DeviceClaims struct {
 	jwt.RegisteredClaims
 }
 
-// GetToken returns the authenication token.
+// GetToken returns the authentication token.
 func (response authenticationResponse) GetToken() string { return response.Token }
 
-// GetInstanceURL returns the Salesforce instance URL to use with the authenication information.
+// GetInstanceURL returns the Salesforce instance URL to use with the authentication information.
 func (response authenticationResponse) GetInstanceURL() string { return response.InstanceURL }
 
 // GetID returns the Salesforce ID of the authenication.
 func (response authenticationResponse) GetID() string { return response.ID }
 
-// GetTokenType returns the authenication token type.
+// GetTokenType returns the authentication token type.
 func (response authenticationResponse) GetTokenType() string { return response.TokenType }
 
 // GetIssuedAt returns the time when the token was issued.
 func (response authenticationResponse) GetIssuedAt() string { return response.IssuedAt }
 
-// GetSignature returns the signature of the authenication.
+// GetSignature returns the signature of the authentication.
 func (response authenticationResponse) GetSignature() string { return response.Signature }
 
-// Authenicate will exchange the JWT signed request for access token.
+// Authenticate will exchange the JWT signed request for access token.
 func Authenticate(request AuthenticationRequest, privateKey io.ReadCloser, client *http.Client) (AuthenticationResponse, error) {
 
-	pemData, err := ioutil.ReadAll(privateKey)
+	pemData, err := io.ReadAll(privateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +121,9 @@ func Authenticate(request AuthenticationRequest, privateKey io.ReadCloser, clien
 	if respErr != nil {
 		return nil, errors.Wrap(respErr, "response is bad")
 	}
+	defer response.Body.Close()
 
-	body, bodyErr := ioutil.ReadAll(response.Body)
+	body, bodyErr := io.ReadAll(response.Body)
 	if bodyErr != nil {
 		return nil, bodyErr
 	}
@@ -141,5 +142,4 @@ func Authenticate(request AuthenticationRequest, privateKey io.ReadCloser, clien
 	}
 
 	return jsonResponse, nil
-
 }

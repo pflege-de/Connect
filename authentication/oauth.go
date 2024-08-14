@@ -3,17 +3,20 @@ package authentication
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
-	"github.com/nimajalali/go-force/force"
+	"github.com/pflege-de/go-force/force"
 )
 
 const (
-	getTokenPath  string = "services/oauth2/token"
+	getTokenPath string = "services/oauth2/token" //nolint:gosec
+	// (Wrongly recognized - G101: Potential hardcoded credentials)
 	authorizePath string = "services/oauth2/authorize"
 )
 
@@ -63,43 +66,44 @@ func (s *OAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // redirectURL must be set when creating a new salesforce connected app. For development edit /etc/hosts with an entry redirecting to 127.0.0.1 for redirectURL
 // later on, we can use localhorst.dev.p4e.io which redirects to 127.0.0.1 in AWS Route53.
 func promptUser() {
-	url := url.URL{
+	u := url.URL{
 		Scheme: "https",
 		Host:   os.Getenv("SF_OAUTH_HOST"),
 		Path:   authorizePath,
 	}
-	q := url.Query()
+	q := u.Query()
 	q.Set("response_type", "code")
 	q.Set("client_id", os.Getenv("SF_OAUTH_CLIENT_ID"))
 	q.Set("redirect_uri", os.Getenv("SF_OAUTH_REDIRECT_URL"))
-	url.RawQuery = q.Encode()
+	u.RawQuery = q.Encode()
 
-	fmt.Printf("\033[32mOpen this link in your browser to authenticate with salesforce OAuth\n\n\033[0m%s\n\n", url.String())
+	fmt.Printf("\033[32mOpen this link in your browser to authenticate with salesforce OAuth\n\n\033[0m%s\n\n", u.String())
 }
 
 // getToken exchanges the authorizationCode for an access and refresh token
 func getToken(client *http.Client, authorizationCode string) (postAuthorizationCodeReponse, error) {
 	tokenResponse := postAuthorizationCodeReponse{}
-	url := url.URL{
+	u := url.URL{
 		Scheme: "https",
 		Host:   os.Getenv("SF_OAUTH_HOST"),
 		Path:   getTokenPath,
 	}
 
-	q := url.Query()
+	q := u.Query()
 	q.Set("grant_type", "authorization_code")
 	q.Set("code", authorizationCode)
 	q.Set("client_id", os.Getenv("SF_OAUTH_CLIENT_ID"))
 	q.Set("client_secret", os.Getenv("SF_OAUTH_CLIENT_SECRET"))
 	q.Set("redirect_uri", os.Getenv("SF_OAUTH_REDIRECT_URL"))
-	url.RawQuery = q.Encode()
+	u.RawQuery = q.Encode()
 
-	res, err := client.Post(url.String(), "application/x-www-form-urlencoded", nil)
+	res, err := client.Post(u.String(), "application/x-www-form-urlencoded", nil)
 	if err != nil {
 		return tokenResponse, fmt.Errorf("error sending the request: %w", err)
 	}
+	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return tokenResponse, fmt.Errorf("error reading the body: %w", err)
 	}
@@ -111,7 +115,7 @@ func getToken(client *http.Client, authorizationCode string) (postAuthorizationC
 	return tokenResponse, nil
 }
 
-func NewOAuthForce() (*force.ForceApi, error) {
+func NewOAuthForce() (*force.ForceApiSObjectInterface, error) {
 	// prompt the user by printing the url to a salesforce login page
 	// launch goroutine accepting the redirect
 	// block until token is returned
@@ -121,7 +125,7 @@ func NewOAuthForce() (*force.ForceApi, error) {
 
 	stopChannel := make(chan bool)
 	authHandler := OAuthHandler{shouldCloseServerChannel: stopChannel}
-	srv := http.Server{Addr: ":443", Handler: &authHandler}
+	srv := http.Server{Addr: ":443", Handler: &authHandler, ReadHeaderTimeout: 30 * time.Second}
 	ctx := context.Background()
 
 	go func(ctx context.Context, srv *http.Server, c chan bool) {
@@ -135,14 +139,18 @@ func NewOAuthForce() (*force.ForceApi, error) {
 	err := srv.ListenAndServeTLS("./tls.crt", "./tls.key")
 	// erstell das zertifikat aus cert-manager
 	//
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		fmt.Printf("error starting server: %v\n", err)
-		// TODO: log.Fatal?
 	}
 
-	return force.CreateWithAccessToken(
-		"v53.0",
-		os.Getenv("EVENT_CLIENT_ID"),
-		authHandler.token.AccessToken,
-		os.Getenv("EVENT_SCINSTANCE"))
+	fapi, err :=
+		force.CreateWithAccessToken(
+			"v53.0",
+			os.Getenv("EVENT_CLIENT_ID"),
+			authHandler.token.AccessToken,
+			os.Getenv("EVENT_SCINSTANCE"),
+			http.DefaultClient,
+		)
+
+	return &fapi, err
 }
