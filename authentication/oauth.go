@@ -115,7 +115,7 @@ func getToken(client *http.Client, authorizationCode string) (postAuthorizationC
 	return tokenResponse, nil
 }
 
-func NewOAuthForce() (*force.ForceApiSObjectInterface, error) {
+func NewOAuthForce() (*force.ForceApiInterface, error) {
 	// prompt the user by printing the url to a salesforce login page
 	// launch goroutine accepting the redirect
 	// block until token is returned
@@ -152,5 +152,5 @@ func NewOAuthForce() (*force.ForceApiSObjectInterface, error) {
 			http.DefaultClient,
 		)
 
-	return &fapi, err
+	return fapi, err
 }

@@ -6,7 +6,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.6.0
 	github.com/nats-io/nats.go v1.37.0
-	github.com/pflege-de/go-force v1.1.2
+	github.com/pflege-de/go-force v1.1.3-0.20240816090546-be9988e1ddcb
 	github.com/pkg/errors v0.9.1
 	github.com/vmihailenco/msgpack v4.0.4+incompatible
 )
