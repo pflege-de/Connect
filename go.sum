@@ -30,6 +30,8 @@ github.com/pflege-de/go-force v1.1.3-0.20240816090546-be9988e1ddcb h1:w8zObCaPxM
 github.com/pflege-de/go-force v1.1.3-0.20240816090546-be9988e1ddcb/go.mod h1:x+l55c2NJ8NU3vrV6anHjAK7hQYNebCvcTv6HQ61qec=
 github.com/pflege-de/go-force v1.1.3-0.20240816103617-a31da66a6b12 h1:EQuVL2fQFK1TjQl1zSOdoKvL3kC+bXtQGTpuSSGD1Dg=
 github.com/pflege-de/go-force v1.1.3-0.20240816103617-a31da66a6b12/go.mod h1:x+l55c2NJ8NU3vrV6anHjAK7hQYNebCvcTv6HQ61qec=
+github.com/pflege-de/go-force v1.1.3 h1:l5IftRnff4gJwN3pCZkeEFy0ndiYDQK+pd+ug6qunzI=
+github.com/pflege-de/go-force v1.1.3/go.mod h1:x+l55c2NJ8NU3vrV6anHjAK7hQYNebCvcTv6HQ61qec=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/vmihailenco/msgpack v4.0.4+incompatible h1:dSLoQfGFAo3F6OoNhwUmLwVgaUXK79GlxNBwueZn0xI=
