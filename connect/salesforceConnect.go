@@ -7,7 +7,7 @@ import (
 	"github.com/pflege-de/go-force/force"
 )
 
-func GetForceApi() *force.ForceApiSObjectInterface {
+func GetForceApi() *force.ForceApiInterface {
 	forceApi, err := authentication.NewForce()
 	if err != nil {
 		log.Printf("Couldn't establish forceApi: %s", err)
@@ -15,7 +15,7 @@ func GetForceApi() *force.ForceApiSObjectInterface {
 	return forceApi
 }
 
-func GetForceApiKeyStringSecret() *force.ForceApiSObjectInterface {
+func GetForceApiKeyStringSecret() *force.ForceApiInterface {
 	forceApi, err := authentication.NewForceKeyStringSecret()
 	if err != nil {
 		log.Printf("Couldn't establish forceApi: %s", err)
@@ -23,7 +23,7 @@ func GetForceApiKeyStringSecret() *force.ForceApiSObjectInterface {
 	return forceApi
 }
 
-func GetForceApiOAuth() *force.ForceApiSObjectInterface {
+func GetForceApiOAuth() *force.ForceApiInterface {
 	forceApi, err := authentication.NewOAuthForce()
 	if err != nil {
 		log.Printf("Couldn't establish forceApi: %s", err)
