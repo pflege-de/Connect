@@ -11,7 +11,7 @@ import (
 	"github.com/pflege-de/go-force/force"
 )
 
-func NewForce() (*force.ForceApiInterface, error) {
+func NewForce() (force.ForceApiInterface, error) {
 	sfRequest := AuthenticationRequest{
 		URL:      os.Getenv("SF_SCAUD"),
 		Username: os.Getenv("SF_SCUSER"),
@@ -38,7 +38,7 @@ func NewForce() (*force.ForceApiInterface, error) {
 	return fapi, err
 }
 
-func NewForceKeyStringSecret() (*force.ForceApiInterface, error) {
+func NewForceKeyStringSecret() (force.ForceApiInterface, error) {
 	sfRequest := AuthenticationRequest{
 		URL:      os.Getenv("SF_SCAUD"),
 		Username: os.Getenv("SF_SCUSER"),
