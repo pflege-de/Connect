@@ -3,7 +3,7 @@ module github.com/pflege-de/connect
 go 1.22.6
 
 require (
-	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/google/uuid v1.6.0
 	github.com/nats-io/nats.go v1.37.0
 	github.com/pflege-de/go-force v1.1.4
