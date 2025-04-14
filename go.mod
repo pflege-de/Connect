@@ -1,6 +1,7 @@
 module github.com/pflege-de/connect
 
 go 1.22.6
+toolchain go1.24.1
 
 require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
@@ -16,8 +17,8 @@ require (
 	github.com/klauspost/compress v1.17.2 // indirect
 	github.com/nats-io/nkeys v0.4.7 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
