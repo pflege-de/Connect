@@ -1,9 +1,7 @@
 package authentication
 
 import (
-	"crypto/x509"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -45,16 +43,7 @@ func NewForceKeyStringSecret() (force.ForceApiInterface, error) {
 		ClientID: os.Getenv("SF_CLIENT_ID"),
 	}
 
-	//ssh.ParseRawPrivateKey
-	//x509.ParsePKCS1PrivateKey([]byte(os.Getenv("SF_SCKEY")))
-	key, err := x509.ParsePKCS8PrivateKey([]byte(os.Getenv("SF_SCKEY")))
-	if err != nil {
-		return nil, err
-	}
-	log.Println(key)
-
-	r := io.NopCloser(strings.NewReader("test")) // r type is io.ReadCloser
-	defer r.Close()
+	r := io.NopCloser(strings.NewReader(os.Getenv("SF_SCKEY")))
 
 	authReponse, err := Authenticate(sfRequest, r, http.DefaultClient)
 	if err != nil {
