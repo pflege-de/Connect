@@ -1,8 +1,6 @@
 module github.com/pflege-de/connect
 
-go 1.23.0
-
-toolchain go1.24.3
+go 1.25.6
 
 require (
 	github.com/golang-jwt/jwt/v4 v4.5.2
@@ -11,6 +9,7 @@ require (
 	github.com/pflege-de/go-force v1.1.4
 	github.com/pkg/errors v0.9.1
 	github.com/vmihailenco/msgpack v4.0.4+incompatible
+	golang.org/x/oauth2 v0.34.0
 )
 
 require (
